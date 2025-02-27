@@ -75,6 +75,7 @@ export function parse(tokens) {
         recursionDepth++;
 
         let expr = parsePrimaryExpression();
+        if (!expr) throw new Error(`Invalid expression at position ${index - 1}`);
 
         while (index < tokens.length) {
             const token = tokens[index];
@@ -82,6 +83,7 @@ export function parse(tokens) {
             if (["+", "-", "*", "/", "==", "!=", ">=", "<="].includes(token)) {
                 index++;
                 const right = parsePrimaryExpression();
+                if (!right) throw new Error(`Expected expression after '${token}'`);
                 expr = { type: "BinaryExpression", operator: token, left: expr, right };
             } else {
                 break;
@@ -94,9 +96,9 @@ export function parse(tokens) {
 
     function parsePrimaryExpression() {
         if (index >= tokens.length) throw new Error("Unexpected end of input");
-    
+
         const token = tokens[index++];
-    
+
         if (!isNaN(token)) return { type: "NumberLiteral", value: Number(token) };
         if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) return { type: "Identifier", name: token };
         if (token === "(") {
@@ -104,58 +106,56 @@ export function parse(tokens) {
             if (tokens[index++] !== ")") throw new Error(`Expected ')' but got '${tokens[index - 1]}'`);
             return expr;
         }
-    
+
         throw new Error(`Unexpected token: '${token}' at position ${index - 1}`);
     }
-    
+
 
     function parseStatement() {
-        if (index >= tokens.length) return null; // ✅ Prevent reading undefined
+        if (index >= tokens.length) return null; // ✅ Prevents reading undefined
 
         const token = tokens[index++];
-        // ✅ Skip semicolons (ignore them)
-        if (token === ";") {
-            return parseStatement();
-        }
 
-        // ✅ Handle closing brace correctly
-        if (token === "}") {
-            return null; // Stop parsing inside a function block
-        }
+        if (token === ";") return parseStatement(); // ✅ Skip semicolons
+        if (token === "}") return null; // ✅ Stop parsing inside a block
 
         if (token === "atur") {
             const name = tokens[index++];
-            if (tokens[index++] !== "=") throw new Error("Expected '='");
+            if (tokens[index++] !== "=") throw new Error("Expected '=' after variable name");
             const value = parseExpression();
             return { type: "VariableDeclaration", name, value };
         }
+
         if (token === "tampilkan") {
             const expr = parseExpression();
             return { type: "PrintStatement", expression: expr };
         }
+
         if (token === "fungsi") {
             const name = tokens[index++];
-            if (tokens[index++] !== "(") throw new Error("Expected '('");
+            if (tokens[index++] !== "(") throw new Error("Expected '(' after function name");
             const params = [];
             while (tokens[index] !== ")") {
                 params.push(tokens[index++]);
                 if (tokens[index] === ",") index++;
             }
             index++; // Skip ')'
-            if (tokens[index++] !== "{") throw new Error("Expected '{'");
+            if (tokens[index++] !== "{") throw new Error("Expected '{' to start function body");
             const body = [];
             while (tokens[index] !== "}" && index < tokens.length) {
                 const stmt = parseStatement();
                 if (stmt) body.push(stmt);
             }
-            index++; // ✅ Ensure '}' is skipped
+            if (tokens[index++] !== "}") throw new Error("Expected '}' at the end of function body");
             return { type: "FunctionDeclaration", name, params, body };
         }
+
         if (token === "kembali") {
             const expr = parseExpression();
             return { type: "ReturnStatement", expression: expr };
         }
-        throw new Error(`Unexpected statement: ${token}`);
+
+        throw new Error(`Unexpected statement: '${token}' at position ${index - 1}`);
     }
 
     const ast = { type: "Program", body: [] };
@@ -166,51 +166,42 @@ export function parse(tokens) {
 }
 
 export function interpret(ast, env = {}) {
-    function evaluate(node, scope = env) {
+    console.log("AST before interpretation:", JSON.stringify(ast, null, 2));
+
+    function evaluate(node) {
+        console.log(`Evaluating node: ${JSON.stringify(node)}`); // Debug AST node
+
         switch (node.type) {
             case "NumberLiteral":
                 return node.value;
             case "Identifier":
-                if (node.name in scope) return scope[node.name];
-                throw new Error(`Undefined variable: ${node.name}`);
+                return env[node.name];
             case "VariableDeclaration":
-                scope[node.name] = evaluate(node.value, scope);
+                env[node.name] = evaluate(node.value);
                 return null;
             case "PrintStatement":
-                console.log(evaluate(node.expression, scope));
+                console.log(evaluate(node.expression));
                 return null;
             case "FunctionDeclaration":
-                scope[node.name] = (...args) => {
-                    const localScope = { ...scope }; // ✅ Separate function scope
-                    node.params.forEach((param, i) => (localScope[param] = args[i]));
+                env[node.name] = (...args) => {
+                    const localEnv = { ...env };
+                    node.params.forEach((param, i) => (localEnv[param] = args[i]));
                     let result = null;
                     for (const statement of node.body) {
                         if (statement.type === "ReturnStatement") {
-                            result = evaluate(statement.expression, localScope);
+                            result = evaluate(statement.expression);
                             break;
                         }
-                        evaluate(statement, localScope);
+                        evaluate(statement);
                     }
                     return result;
                 };
                 return null;
             case "ReturnStatement":
-                return evaluate(node.expression, scope);
-            case "BinaryExpression":
-                const left = evaluate(node.left, scope);
-                const right = evaluate(node.right, scope);
-                switch (node.operator) {
-                    case "+": return left + right;
-                    case "-": return left - right;
-                    case "*": return left * right;
-                    case "/": return right !== 0 ? left / right : NaN;
-                    case "==": return left === right;
-                    case "!=": return left !== right;
-                    case ">=": return left >= right;
-                    case "<=": return left <= right;
-                    default: throw new Error(`Unsupported operator: ${node.operator}`);
-                }
+                return evaluate(node.expression);
         }
+
+        throw new Error(`Unknown AST node type: ${node.type}`);
     }
 
     for (const statement of ast.body) evaluate(statement);

@@ -1,5 +1,1 @@
-fungsi tambah(a, b) {
-    kembali a + b;
-}
-
-tampilkan tambah(1, 2);
+tampilkan 1;
