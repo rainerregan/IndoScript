@@ -112,16 +112,21 @@ export function parse(tokens) {
 
 
     function parseStatement() {
-        if (index >= tokens.length) return null; // ✅ Prevents reading undefined
+        if (index >= tokens.length) return null; // 🚨 Prevents reading undefined
 
         const token = tokens[index++];
 
-        if (token === ";") return parseStatement(); // ✅ Skip semicolons
-        if (token === "}") return null; // ✅ Stop parsing inside a block
+        console.log(`Parsing token: '${token}' at position ${index - 1}`); // 🛠 Debugging
+
+        if (token === ";") return parseStatement();
+        if (token === "}") return null; // 🚨 Can return null, which might cause issues
 
         if (token === "atur") {
             const name = tokens[index++];
-            if (tokens[index++] !== "=") throw new Error("Expected '=' after variable name");
+            if (tokens[index++] !== "=") {
+                console.error("Tokens before error:", tokens.slice(index - 5, index + 5));
+                throw new Error("Expected '=' after variable name");
+            }
             const value = parseExpression();
             return { type: "VariableDeclaration", name, value };
         }
@@ -133,20 +138,20 @@ export function parse(tokens) {
 
         if (token === "fungsi") {
             const name = tokens[index++];
-            if (tokens[index++] !== "(") throw new Error("Expected '(' after function name");
+            if (tokens[index++] !== "(") throw new Error("Expected '('");
             const params = [];
             while (tokens[index] !== ")") {
                 params.push(tokens[index++]);
                 if (tokens[index] === ",") index++;
             }
             index++; // Skip ')'
-            if (tokens[index++] !== "{") throw new Error("Expected '{' to start function body");
+            if (tokens[index++] !== "{") throw new Error("Expected '{'");
             const body = [];
             while (tokens[index] !== "}" && index < tokens.length) {
                 const stmt = parseStatement();
                 if (stmt) body.push(stmt);
             }
-            if (tokens[index++] !== "}") throw new Error("Expected '}' at the end of function body");
+            if (tokens[index] === "}") index++; // ✅ Ensure '}' is skipped
             return { type: "FunctionDeclaration", name, params, body };
         }
 
@@ -155,12 +160,16 @@ export function parse(tokens) {
             return { type: "ReturnStatement", expression: expr };
         }
 
-        throw new Error(`Unexpected statement: '${token}' at position ${index - 1}`);
+        console.error("Unexpected token:", token); // 🛠 Debugging
+        throw new Error(`Unexpected statement: ${token}`);
     }
 
     const ast = { type: "Program", body: [] };
     while (index < tokens.length) {
-        ast.body.push(parseStatement());
+        const stmt = parseStatement();
+        if (stmt !== null) { // 🚨 Prevent null from being added
+            ast.body.push(stmt);
+        }
     }
     return ast;
 }
@@ -169,7 +178,11 @@ export function interpret(ast, env = {}) {
     console.log("AST before interpretation:", JSON.stringify(ast, null, 2));
 
     function evaluate(node) {
-        console.log(`Evaluating node: ${JSON.stringify(node)}`); // Debug AST node
+        if (!node) {
+            throw new Error("Unexpected null AST node"); // 🚨 Helps pinpoint the issue
+        }
+
+        console.log(`Evaluating node: ${JSON.stringify(node)}`); // 🛠 Debug output
 
         switch (node.type) {
             case "NumberLiteral":
@@ -199,10 +212,12 @@ export function interpret(ast, env = {}) {
                 return null;
             case "ReturnStatement":
                 return evaluate(node.expression);
+            default:
+                throw new Error(`Unknown AST node type: ${node.type}`);
         }
-
-        throw new Error(`Unknown AST node type: ${node.type}`);
     }
 
-    for (const statement of ast.body) evaluate(statement);
+    for (const statement of ast.body) {
+        evaluate(statement);
+    }
 }
