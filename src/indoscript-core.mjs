@@ -43,6 +43,11 @@ export function parse(tokens) {
             return parseStatement();
         }
 
+        // ✅ Handle closing brace correctly
+        if (token === "}") {
+            return null; // Stop parsing inside a function block
+        }
+
         if (token === "atur") {
             const name = tokens[index++];
             if (tokens[index++] !== "=") throw new Error("Expected '='");
