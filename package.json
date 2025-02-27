@@ -4,7 +4,7 @@
   "type": "commonjs",
   "bin": "indoscript.cjs",
   "scripts": {
-    "build": "pkg . --output indo.exe"
+    "build": "pkg . --output build/indo-win-x64 --targets node18-win-x64 --debug"
   },
   "pkg": {
     "assets": "src/**/*"
