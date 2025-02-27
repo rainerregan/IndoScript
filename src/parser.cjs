@@ -1,5 +1,6 @@
 let recursionDepth = 0;
 const MAX_DEPTH = 1000; // Prevent infinite recursion
+const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 
 function parse(tokens) {
   let index = 0;
@@ -70,7 +71,7 @@ function parse(tokens) {
 
     const token = tokens[index++];
 
-    console.log(`Parsing token: '${token}' at position ${index - 1}`); // 🛠 Debugging
+    if (DEBUG_MODE) console.log(`Parsing token: '${token}' at position ${index - 1}`); // 🛠 Debugging
 
     if (token === ";") return parseStatement();
     if (token === "}") return null; // 🚨 Can return null, which might cause issues

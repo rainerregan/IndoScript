@@ -1,13 +1,14 @@
+const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 
 function interpret(ast, env = {}) {
-  console.log("AST before interpretation:", JSON.stringify(ast, null, 2));
+  if (DEBUG_MODE) console.log("AST before interpretation:", JSON.stringify(ast, null, 2));
 
   function evaluate(node, currentEnv) {
     if (!node) {
       throw new Error("Unexpected null AST node"); // 🚨 Helps pinpoint the issue
     }
 
-    console.log(`Evaluating node: ${JSON.stringify(node)}`, `With env:`, env); // 🛠 Debug output
+    if (DEBUG_MODE) console.log(`Evaluating node: ${JSON.stringify(node)}`, `With env:`, env); // 🛠 Debug output
 
     switch (node.type) {
       case "NumberLiteral":
@@ -15,11 +16,11 @@ function interpret(ast, env = {}) {
       case "StringLiteral":
         return node.value;
       case "Identifier":
-        console.log(`Checking if '${node.name}' is in env`, currentEnv); // 🛠 Debugging
+        if (DEBUG_MODE) console.log(`Checking if '${node.name}' is in env`, currentEnv); // 🛠 Debugging
         if (!(node.name in currentEnv)) {
           throw new Error(`Undefined variable: ${node.name}`);
         }
-        console.log(`Resolved Identifier '${node.name}' to`, currentEnv[node.name]); // 🛠 Debugging
+        if (DEBUG_MODE) console.log(`Resolved Identifier '${node.name}' to`, currentEnv[node.name]); // 🛠 Debugging
         return currentEnv[node.name];
       case "VariableDeclaration":
         currentEnv[node.name] = evaluate(node.value, currentEnv);
@@ -66,18 +67,18 @@ function interpret(ast, env = {}) {
 
         // Eksekusi fungsi dalam environment baru
         let result = null;
-        console.log(`Executing function '${node.callee.name}'`, localEnv); // 🛠 Debugging
+        if (DEBUG_MODE) console.log(`Executing function '${node.callee.name}'`, localEnv); // 🛠 Debugging
         for (const statement of func.body) {
           if (statement.type === "ReturnStatement") {
             result = evaluate(statement.expression, localEnv);
             break;
           }
-          console.log(`Evaluating statement: ${JSON.stringify(statement)}`); // 🛠 Debugging
+          if (DEBUG_MODE) console.log(`Evaluating statement: ${JSON.stringify(statement)}`); // 🛠 Debugging
           evaluate(statement, localEnv);
         }
         return result;
       case "FunctionDeclaration":
-        console.log(`Declaring function '${node.name}'`, node.params, node.body); // 🛠 Debugging
+        if (DEBUG_MODE) console.log(`Declaring function '${node.name}'`, node.params, node.body); // 🛠 Debugging
         env[node.name] = {
           type: "Function",
           params: node.params,
