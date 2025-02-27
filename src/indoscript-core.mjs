@@ -12,6 +12,24 @@ export function parse(tokens) {
     let index = 0;
 
     function parseExpression() {
+        let left = parsePrimaryExpression();
+
+        while (index < tokens.length) {
+            const operator = tokens[index];
+
+            if (operator === "+" || operator === "-" || operator === "*" || operator === "/") {
+                index++;
+                const right = parsePrimaryExpression();
+                left = { type: "BinaryExpression", operator, left, right };
+            } else {
+                break;
+            }
+        }
+
+        return left;
+    }
+
+    function parsePrimaryExpression() {
         const token = tokens[index++];
         if (!isNaN(token)) return { type: "NumberLiteral", value: Number(token) };
         if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) return { type: "Identifier", name: token };
