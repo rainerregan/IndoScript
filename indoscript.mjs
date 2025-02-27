@@ -1,5 +1,5 @@
 import fs from "fs";
-import { tokenize, parse, interpret } from "./src/indoscript-core.mjs";
+import run from "./src/index.mjs";
 
 const filename = process.argv[2];
 if (!filename || !filename.endsWith(".is")) {
@@ -12,8 +12,5 @@ fs.readFile(filename, "utf8", (err, code) => {
         console.error("Gagal membaca file:", err);
         process.exit(1);
     }
-    const tokens = tokenize(code);
-    console.log("Tokens: ",tokens);
-    const ast = parse(tokens);
-    interpret(ast);
+    run(code);
 });
