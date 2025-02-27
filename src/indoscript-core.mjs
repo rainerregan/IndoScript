@@ -12,27 +12,43 @@ export function parse(tokens) {
     let index = 0;
 
     function parseExpression() {
-        let left = parsePrimaryExpression();
+        let expr = parsePrimaryExpression();
 
         while (index < tokens.length) {
-            const operator = tokens[index];
+            const token = tokens[index];
 
-            if (operator === "+" || operator === "-" || operator === "*" || operator === "/") {
+            if (token === "(") {
+                index++; // Skip '('
+                const args = [];
+                while (tokens[index] !== ")") {
+                    args.push(parseExpression());
+                    if (tokens[index] === ",") index++; // Skip commas
+                }
+                index++; // Skip ')'
+                expr = { type: "FunctionCall", callee: expr, arguments: args };
+            } else if (["+", "-", "*", "/"].includes(token)) {
                 index++;
                 const right = parsePrimaryExpression();
-                left = { type: "BinaryExpression", operator, left, right };
+                expr = { type: "BinaryExpression", operator: token, left: expr, right };
             } else {
                 break;
             }
         }
 
-        return left;
+        return expr;
     }
 
     function parsePrimaryExpression() {
         const token = tokens[index++];
+
         if (!isNaN(token)) return { type: "NumberLiteral", value: Number(token) };
         if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) return { type: "Identifier", name: token };
+        if (token === "(") {
+            const expr = parseExpression();
+            if (tokens[index++] !== ")") throw new Error("Expected ')'");
+            return expr;
+        }
+
         throw new Error(`Unexpected token: ${token}`);
     }
 
