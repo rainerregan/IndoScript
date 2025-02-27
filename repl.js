@@ -7,6 +7,8 @@ const rl = readline.createInterface({
   prompt: "IndoScript> ",
 });
 
+const context = {}; // Initialize the context object
+
 console.log("IndoScript REPL - Ketik 'keluar' untuk keluar.");
 rl.prompt();
 
@@ -17,7 +19,7 @@ rl.on("line", (line) => {
   }
 
   try {
-    run(line);
+    run(line, context); // Pass the context object
   } catch (err) {
     console.error("Error:", err.message);
   }
