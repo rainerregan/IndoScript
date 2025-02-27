@@ -1,0 +1,12 @@
+{
+  "name": "indo",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": "indoscript.js",
+  "scripts": {
+    "build": "pkg . --targets win-x64 --output indo.exe"
+  },
+  "pkg": {
+    "assets": "src/**/*"
+  }
+}
