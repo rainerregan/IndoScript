@@ -1,5 +1,5 @@
-import readline from "readline";
-import run from "./src/index.mjs";
+const readline = require("readline");
+const run = require("./src/index.cjs");
 
 const rl = readline.createInterface({
   input: process.stdin,

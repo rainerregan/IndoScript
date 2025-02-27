@@ -1,5 +1,5 @@
 
-export function interpret(ast, env = {}) {
+function interpret(ast, env = {}) {
   console.log("AST before interpretation:", JSON.stringify(ast, null, 2));
 
   function evaluate(node, currentEnv) {
@@ -97,3 +97,5 @@ export function interpret(ast, env = {}) {
     evaluate(statement, env);
   }
 }
+
+module.exports = interpret;

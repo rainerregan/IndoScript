@@ -1,5 +1,5 @@
-import fs from "fs";
-import run from "./src/index.mjs";
+const fs = require("fs");
+const run = require("./src/index.cjs");
 
 const filename = process.argv[2];
 if (!filename || !filename.endsWith(".is")) {

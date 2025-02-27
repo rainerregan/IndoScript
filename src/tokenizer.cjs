@@ -1,5 +1,4 @@
-
-export function tokenize(code) {
+function tokenize(code) {
   const tokens = [];
   let i = 0;
 
@@ -102,3 +101,5 @@ export function tokenize(code) {
 
   return tokens;
 }
+
+module.exports = tokenize;

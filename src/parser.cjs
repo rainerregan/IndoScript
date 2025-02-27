@@ -1,7 +1,7 @@
 let recursionDepth = 0;
 const MAX_DEPTH = 1000; // Prevent infinite recursion
 
-export function parse(tokens) {
+function parse(tokens) {
   let index = 0;
 
   function parseExpression() {
@@ -134,3 +134,5 @@ export function parse(tokens) {
   }
   return ast;
 }
+
+module.exports = parse;
