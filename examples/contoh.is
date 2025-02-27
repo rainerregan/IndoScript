@@ -1,5 +1,5 @@
-fungsi halo() {
-    tampilkan "Halo dunia!";
+fungsi tambah(a, b) {
+    tampilkan a + b;
 }
 
-halo();
+tambah(7, 2);

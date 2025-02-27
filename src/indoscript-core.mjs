@@ -255,6 +255,10 @@ export function interpret(ast, env = {}) {
             case "StringLiteral":
                 return node.value;
             case "Identifier":
+                if (!(node.name in env)) {
+                    throw new Error(`Undefined variable: ${node.name}`);
+                }
+                console.log(`Resolved Identifier '${node.name}' to`, env[node.name]); // 🛠 Debugging
                 return env[node.name];
             case "VariableDeclaration":
                 env[node.name] = evaluate(node.value);
@@ -287,24 +291,32 @@ export function interpret(ast, env = {}) {
                 }
             case "FunctionCall":
                 const callee = evaluate(node.callee);
-                console.log("Memanggil fungsi:", node.callee.name || JSON.stringify(node.callee));
                 if (typeof callee !== "function") {
-                    throw new Error(`Callee bukan fungsi: ${JSON.stringify(callee)}`);
+                    throw new Error(`Callee is not a function: ${JSON.stringify(callee)}`);
                 }
                 const args = node.arguments.map(evaluate);
-                return callee(...args);
+
+                console.log(`Calling function: ${node.callee.name} with arguments:`, args); // 🛠 Debugging
+
+                return callee(...args); // ✅ Correctly pass arguments
             case "FunctionDeclaration":
-                console.log("Mendaftarkan fungsi:", node.name);
                 env[node.name] = (...args) => {
-                    const localEnv = { ...env };
-                    node.params.forEach((param, i) => (localEnv[param] = args[i]));
+                    const localEnv = { ...env }; // ✅ Create a separate function scope
+
+                    // ✅ Assign arguments to parameters in the local environment
+                    node.params.forEach((param, i) => {
+                        localEnv[param] = args[i];
+                    });
+
+                    console.log(`Executing function '${node.name}' with env:`, localEnv); // 🛠 Debugging
+
                     let result = null;
                     for (const statement of node.body) {
                         if (statement.type === "ReturnStatement") {
-                            result = evaluate(statement.expression);
+                            result = evaluate(statement.expression, localEnv);
                             break;
                         }
-                        evaluate(statement);
+                        evaluate(statement, localEnv);
                     }
                     return result;
                 };
