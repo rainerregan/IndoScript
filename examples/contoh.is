@@ -1,5 +1,5 @@
 fungsi tambah(a, b) {
-    tampilkan a + b;
+    kembali a + b;
 }
 
-tambah(7, 2);
+tampilkan tambah(7, 2);

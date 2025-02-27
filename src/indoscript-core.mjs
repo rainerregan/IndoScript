@@ -242,12 +242,12 @@ export function parse(tokens) {
 export function interpret(ast, env = {}) {
     console.log("AST before interpretation:", JSON.stringify(ast, null, 2));
 
-    function evaluate(node) {
+    function evaluate(node, currentEnv) {
         if (!node) {
             throw new Error("Unexpected null AST node"); // 🚨 Helps pinpoint the issue
         }
 
-        console.log(`Evaluating node: ${JSON.stringify(node)}`); // 🛠 Debug output
+        console.log(`Evaluating node: ${JSON.stringify(node)}`, `With env:`, env); // 🛠 Debug output
 
         switch (node.type) {
             case "NumberLiteral":
@@ -255,20 +255,21 @@ export function interpret(ast, env = {}) {
             case "StringLiteral":
                 return node.value;
             case "Identifier":
-                if (!(node.name in env)) {
+                console.log(`Checking if '${node.name}' is in env`, currentEnv); // 🛠 Debugging
+                if (!(node.name in currentEnv)) {
                     throw new Error(`Undefined variable: ${node.name}`);
                 }
-                console.log(`Resolved Identifier '${node.name}' to`, env[node.name]); // 🛠 Debugging
-                return env[node.name];
+                console.log(`Resolved Identifier '${node.name}' to`, currentEnv[node.name]); // 🛠 Debugging
+                return currentEnv[node.name];
             case "VariableDeclaration":
-                env[node.name] = evaluate(node.value);
+                currentEnv[node.name] = evaluate(node.value, currentEnv);
                 return null;
             case "PrintStatement":
-                console.log(evaluate(node.expression));
+                console.log(evaluate(node.expression, currentEnv));
                 return null;
             case "BinaryExpression":
-                const left = evaluate(node.left);
-                const right = evaluate(node.right);
+                const left = evaluate(node.left, currentEnv);
+                const right = evaluate(node.right, currentEnv);
                 switch (node.operator) {
                     case "+":
                         return left + right;
@@ -290,47 +291,49 @@ export function interpret(ast, env = {}) {
                         throw new Error(`Unknown operator: ${node.operator}`);
                 }
             case "FunctionCall":
-                const callee = evaluate(node.callee);
-                if (typeof callee !== "function") {
-                    throw new Error(`Callee is not a function: ${JSON.stringify(callee)}`);
+                const func = evaluate(node.callee, currentEnv); // Evaluasi fungsi yang dipanggil
+                if (!func || func.type !== "Function") {
+                    throw new Error(`'${node.callee.name}' is not a function`);
                 }
-                const args = node.arguments.map(evaluate);
 
-                console.log(`Calling function: ${node.callee.name} with arguments:`, args); // 🛠 Debugging
+                const args = node.arguments.map(arg => evaluate(arg, currentEnv)); // Evaluasi argument
 
-                return callee(...args); // ✅ Correctly pass arguments
-            case "FunctionDeclaration":
-                env[node.name] = (...args) => {
-                    const localEnv = { ...env }; // ✅ Create a separate function scope
+                // 🔥 BUAT ENVIRONMENT LOKAL UNTUK FUNGSI 🔥
+                const localEnv = { ...currentEnv };
+                func.params.forEach((param, index) => {
+                    localEnv[param] = args[index];
+                });
 
-                    // ✅ Assign arguments to parameters in the local environment
-                    node.params.forEach((param, i) => {
-                        localEnv[param] = args[i];
-                    });
-
-                    console.log(`Executing function '${node.name}' with env:`, localEnv); // 🛠 Debugging
-
-                    let result = null;
-                    for (const statement of node.body) {
-                        if (statement.type === "ReturnStatement") {
-                            result = evaluate(statement.expression, localEnv);
-                            break;
-                        }
-                        evaluate(statement, localEnv);
+                // Eksekusi fungsi dalam environment baru
+                let result = null;
+                console.log(`Executing function '${node.callee.name}'`, localEnv); // 🛠 Debugging
+                for (const statement of func.body) {
+                    if (statement.type === "ReturnStatement") {
+                        result = evaluate(statement.expression, localEnv);
+                        break;
                     }
-                    return result;
+                    console.log(`Evaluating statement: ${JSON.stringify(statement)}`); // 🛠 Debugging
+                    evaluate(statement, localEnv);
+                }
+                return result;
+            case "FunctionDeclaration":
+                console.log(`Declaring function '${node.name}'`, node.params, node.body); // 🛠 Debugging
+                env[node.name] = {
+                    type: "Function",
+                    params: node.params,
+                    body: node.body,
                 };
                 return null;
             case "ExpressionStatement":
-                return evaluate(node.expression);
+                return evaluate(node.expression, currentEnv);
             case "ReturnStatement":
-                return evaluate(node.expression);
+                return evaluate(node.expression, currentEnv);
             default:
                 throw new Error(`Unknown AST node type: ${node.type}`);
         }
     }
 
     for (const statement of ast.body) {
-        evaluate(statement);
+        evaluate(statement, env);
     }
 }
