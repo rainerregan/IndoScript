@@ -20,6 +20,11 @@ export function parse(tokens) {
 
     function parseStatement() {
         const token = tokens[index++];
+        // ✅ Skip semicolons (ignore them)
+        if (token === ";") {
+            return parseStatement();
+        }
+
         if (token === "atur") {
             const name = tokens[index++];
             if (tokens[index++] !== "=") throw new Error("Expected '='");
