@@ -13,6 +13,7 @@ fs.readFile(filename, "utf8", (err, code) => {
         process.exit(1);
     }
     const tokens = tokenize(code);
+    console.log("Tokens: ",tokens);
     const ast = parse(tokens);
     interpret(ast);
 });

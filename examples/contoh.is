@@ -1,21 +1,5 @@
-// Deklarasi variabel
-atur x = 10;
-atur y = 5;
-
-// Operasi matematika
-atur hasil = x + y;
-tampilkan hasil; // Output: 15
-
-// Fungsi sederhana
 fungsi tambah(a, b) {
     kembali a + b;
 }
 
-tampilkan tambah(7, 3); // Output: 10
-
-// Fungsi tanpa return
-fungsi sapa(nama) {
-    tampilkan "Halo, " + nama + "!";
-}
-
-sapa("Budi"); // Output: Halo, Budi!
+tampilkan tambah(4, 5);

@@ -59,10 +59,12 @@ export function tokenize(code) {
 
         if (char === `"`) {
             let str = "";
-            i++; // Skip the opening quote
-            while (i < code.length && code[i] !== `"`) str += code[i++];
-            i++; // Skip closing quote
-            tokens.push(`"${str}"`);
+            i++; // ✅ Skip the opening quote
+            while (i < code.length && code[i] !== `"`) {
+                str += code[i++];
+            }
+            i++; // ✅ Skip the closing quote
+            tokens.push({ type: "StringLiteral", value: str }); // ✅ Store string properly
             continue;
         }
 
@@ -116,7 +118,17 @@ export function parse(tokens) {
         while (index < tokens.length) {
             const token = tokens[index];
 
-            if (["+", "-", "*", "/", "==", "!=", ">=", "<="].includes(token)) {
+            if (token === "(") {
+                index++; // ✅ Skip '('
+                const args = [];
+                while (tokens[index] !== ")" && index < tokens.length) {
+                    args.push(parseExpression());
+                    if (tokens[index] === ",") index++; // ✅ Handle multiple arguments
+                }
+                if (tokens[index] !== ")") throw new Error("Expected closing ')'");
+                index++; // ✅ Skip ')'
+                expr = { type: "FunctionCall", callee: expr, arguments: args };
+            } else if (["+", "-", "*", "/", "==", "!=", ">=", "<="].includes(token)) {
                 index++;
                 const right = parsePrimaryExpression();
                 if (!right) throw new Error(`Expected expression after '${token}'`);
@@ -139,7 +151,8 @@ export function parse(tokens) {
         if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) return { type: "Identifier", name: token };
         if (token === "(") {
             const expr = parseExpression();
-            if (tokens[index++] !== ")") throw new Error(`Expected ')' but got '${tokens[index - 1]}'`);
+            if (tokens[index] !== ")") throw new Error("Expected closing ')'");
+            index++;
             return expr;
         }
 
