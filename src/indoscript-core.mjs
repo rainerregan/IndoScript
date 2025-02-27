@@ -133,6 +133,13 @@ export function parse(tokens) {
                 const right = parsePrimaryExpression();
                 if (!right) throw new Error(`Expected expression after '${token}'`);
                 expr = { type: "BinaryExpression", operator: token, left: expr, right };
+            } else if (token === ";") {
+                index++;
+                break;
+            } else if (token === "kembali") {
+                index++;
+                expr = { type: "ReturnStatement", expression: expr };
+                break;
             } else {
                 break;
             }
@@ -211,6 +218,13 @@ export function parse(tokens) {
             return { type: "ReturnStatement", expression: expr };
         }
 
+        // ✅ Handle function call
+        if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/) && tokens[index] === "(") {
+            index--; // Move back to reprocess as expression
+            const expr = parseExpression();
+            return { type: "ExpressionStatement", expression: expr };
+        }
+
         console.error("Unexpected token:", token); // 🛠 Debugging
         throw new Error(`Unexpected statement: ${token}`);
     }
@@ -237,6 +251,8 @@ export function interpret(ast, env = {}) {
 
         switch (node.type) {
             case "NumberLiteral":
+                return node.value;
+            case "StringLiteral":
                 return node.value;
             case "Identifier":
                 return env[node.name];
@@ -271,9 +287,14 @@ export function interpret(ast, env = {}) {
                 }
             case "FunctionCall":
                 const callee = evaluate(node.callee);
+                console.log("Memanggil fungsi:", node.callee.name || JSON.stringify(node.callee));
+                if (typeof callee !== "function") {
+                    throw new Error(`Callee bukan fungsi: ${JSON.stringify(callee)}`);
+                }
                 const args = node.arguments.map(evaluate);
                 return callee(...args);
             case "FunctionDeclaration":
+                console.log("Mendaftarkan fungsi:", node.name);
                 env[node.name] = (...args) => {
                     const localEnv = { ...env };
                     node.params.forEach((param, i) => (localEnv[param] = args[i]));
@@ -288,6 +309,8 @@ export function interpret(ast, env = {}) {
                     return result;
                 };
                 return null;
+            case "ExpressionStatement":
+                return evaluate(node.expression);
             case "ReturnStatement":
                 return evaluate(node.expression);
             default:

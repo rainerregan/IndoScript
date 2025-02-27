@@ -1,7 +1,5 @@
-// Deklarasi variabel
-atur x = 10;
-atur y = 5;
+fungsi halo() {
+    tampilkan "Halo dunia!";
+}
 
-// Operasi matematika
-atur hasil = x + y;
-tampilkan hasil; // Output: 15
+halo();
