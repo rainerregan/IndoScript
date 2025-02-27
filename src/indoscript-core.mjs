@@ -148,6 +148,9 @@ export function parse(tokens) {
         const token = tokens[index++];
 
         if (!isNaN(token)) return { type: "NumberLiteral", value: Number(token) };
+        if (typeof token === "object" && token.type === "StringLiteral") {
+            return { type: "StringLiteral", value: token.value }; // ✅ Correctly process string literals
+        }
         if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) return { type: "Identifier", name: token };
         if (token === "(") {
             const expr = parseExpression();
@@ -156,9 +159,8 @@ export function parse(tokens) {
             return expr;
         }
 
-        throw new Error(`Unexpected token: '${token}' at position ${index - 1}`);
+        throw new Error(`Unexpected token: '${JSON.stringify(token)}' at position ${index - 1}`);
     }
-
 
     function parseStatement() {
         if (index >= tokens.length) return null; // 🚨 Prevents reading undefined
@@ -244,6 +246,33 @@ export function interpret(ast, env = {}) {
             case "PrintStatement":
                 console.log(evaluate(node.expression));
                 return null;
+            case "BinaryExpression":
+                const left = evaluate(node.left);
+                const right = evaluate(node.right);
+                switch (node.operator) {
+                    case "+":
+                        return left + right;
+                    case "-":
+                        return left - right;
+                    case "*":
+                        return left * right;
+                    case "/":
+                        return left / right;
+                    case "==":
+                        return left === right;
+                    case "!=":
+                        return left !== right;
+                    case ">=":
+                        return left >= right;
+                    case "<=":
+                        return left <= right;
+                    default:
+                        throw new Error(`Unknown operator: ${node.operator}`);
+                }
+            case "FunctionCall":
+                const callee = evaluate(node.callee);
+                const args = node.arguments.map(evaluate);
+                return callee(...args);
             case "FunctionDeclaration":
                 env[node.name] = (...args) => {
                     const localEnv = { ...env };

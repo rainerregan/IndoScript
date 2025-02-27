@@ -1,5 +1,7 @@
-fungsi tambah(a, b) {
-    kembali a + b;
-}
+// Deklarasi variabel
+atur x = 10;
+atur y = 5;
 
-tampilkan tambah(4, 5);
+// Operasi matematika
+atur hasil = x + y;
+tampilkan hasil; // Output: 15
