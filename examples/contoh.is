@@ -1,5 +1,6 @@
 fungsi tambah(a, b) {
-    tampilkan a + b;
+    kembali a + b;
 }
 
-tambah(7, 2);
+atur hasil = tambah(5, 10);
+tampilkan hasil;
