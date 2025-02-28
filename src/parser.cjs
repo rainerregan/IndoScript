@@ -52,6 +52,9 @@ function parse(tokens) {
     if (typeof token === "object" && token.type === "BooleanLiteral") {
       return { type: "BooleanLiteral", value: token.value }; // ✅ Correctly process boolean literals
     }
+    if (token === "[") {
+      return parseArrayLiteral();
+    }
     if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) return { type: "Identifier", name: token };
     if (token === "(") {
       const expr = parseExpression();
@@ -61,6 +64,17 @@ function parse(tokens) {
     }
 
     throw new Error(`Unexpected token: '${JSON.stringify(token)}' at position ${index - 1}`);
+  }
+
+  function parseArrayLiteral() {
+    const elements = [];
+    while (tokens[index] !== "]" && index < tokens.length) {
+      elements.push(parseExpression());
+      if (tokens[index] === ",") index++;
+    }
+    if (tokens[index] !== "]") throw new Error("Expected closing ']'");
+    index++;
+    return { type: "ArrayLiteral", elements };
   }
 
   function parseStatement() {

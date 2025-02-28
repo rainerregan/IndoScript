@@ -101,6 +101,18 @@ function tokenize(code) {
       continue;
     }
 
+    if (char === "[") {
+      tokens.push("[");
+      i++;
+      continue;
+    }
+
+    if (char === "]") {
+      tokens.push("]");
+      i++;
+      continue;
+    }
+
     if (/[A-Za-z_]/.test(char)) {
       tokens.push(readIdentifier(code, i));
       i += tokens[tokens.length - 1].length;
@@ -155,7 +167,7 @@ function readStringLiteral(code, i) {
 }
 
 function isSingleCharToken(char) {
-  return ["+", "-", "*", "/", "(", ")", "{", "}", ",", ";"].includes(char);
+  return ["+", "-", "*", "/", "(", ")", "{", "}", ",", ";", "[", "]"].includes(char);
 }
 
 function isKeyword(code, i, keyword) {
