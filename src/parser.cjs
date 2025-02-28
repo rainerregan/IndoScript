@@ -171,6 +171,10 @@ function parse(tokens) {
         index--; // Move back to reprocess as expression
         const expr = parseExpression();
         return { type: "ExpressionStatement", expression: expr };
+      } else if (tokens[index] === ".") {
+        index--; // Move back to reprocess as expression
+        const expr = parseExpression();
+        return { type: "ExpressionStatement", expression: expr };
       }
     }
 

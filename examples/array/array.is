@@ -1,12 +1,9 @@
 atur array = [1, 1, 2, 4]
 
 // Push
-// cetak(array)
-// cetak(array.dorong(8))
+cetak(array)
+array.dorong(8)
 
-// atur newArray = [0, 1, 2, 4, 8, ...array]
+atur newArray = [0, 1, 2, 4, 8, ...array]
 
 cetak(array)
-
-// Using untukSetiap to iterate over the array
-array.dorong(16)
