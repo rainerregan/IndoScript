@@ -2,14 +2,6 @@
 
 IndoScript adalah bahasa pemrograman sederhana yang dirancang untuk memudahkan pemrograman dengan sintaks yang mirip dengan bahasa Indonesia. Bahasa ini mendukung berbagai fitur yang tersedia pada JavaScript.
 
-## Fitur (Saat Ini)
-
-- Deklarasi variabel
-- Fungsi dan fungsi panah (arrow function)
-- Pernyataan kondisi (`jika`, `dan jika`, `lainnya`)
-- Loop (`selama`, `untuk`, `untukSetiap`)
-- Array dan metode array (`push`, `forEach`)
-
 ## Contoh Kode
 
 Berikut adalah contoh kode sederhana dalam IndoScript:
@@ -54,6 +46,31 @@ arr.untukSetiap((item, index) => {
 });
 
 ```
+
+## IndoScript Product Roadmap
+
+### Versi 1.0 - Rilis Awal
+#### Fitur Utama
+- [x] Deklarasi variabel
+- [x] Fungsi dan fungsi panah (arrow function)
+- [x] Pernyataan kondisi (jika, dan jika, lainnya)
+- [x] Loop (selama, untuk, untukSetiap)
+- [x] Array dan metode array (push, forEach)
+- [x] REPL (Read-Eval-Print Loop) untuk interaktif coding
+
+#### Dokumentasi
+- [x] README.md dengan panduan penggunaan dasar
+- [x] Contoh kode di folder examples
+
+### Versi 1.1 - Peningkatan Bahasa
+#### Fitur Baru
+- [ ] Dukungan untuk objek dan properti
+- [ ] Metode array tambahan (map, filter, reduce)
+- [ ] Penanganan error yang lebih baik
+
+#### Dokumentasi
+- [ ] Panduan penggunaan objek dan properti
+- [ ] Contoh kode tambahan untuk fitur baru
 
 ## Kontribusi
 Kontribusi sangat diterima! Silakan fork repositori ini dan buat pull request dengan perubahan Anda.
