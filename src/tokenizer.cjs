@@ -101,6 +101,12 @@ function tokenize(code) {
       continue;
     }
 
+    if (code.slice(i, i + 3) === "...") {
+      tokens.push("...");
+      i += 3;
+      continue;
+    }
+
     if (char === "[") {
       tokens.push("[");
       i++;

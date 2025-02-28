@@ -75,7 +75,12 @@ function parse(tokens) {
   function parseArrayLiteral() {
     const elements = [];
     while (tokens[index] !== "]" && index < tokens.length) {
-      elements.push(parseExpression());
+      if (tokens[index] === "...") {
+        index++; // Skip '...'
+        elements.push({ type: "SpreadElement", argument: parseExpression() });
+      } else {
+        elements.push(parseExpression());
+      }
       if (tokens[index] === ",") index++;
     }
     if (tokens[index] !== "]") throw new Error("Expected closing ']'");

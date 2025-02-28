@@ -18,7 +18,7 @@ function interpret(ast, env = {}) {
       case "BooleanLiteral":
         return node.value;
       case "ArrayLiteral":
-        return node.elements.map(element => evaluate(element, currentEnv));
+        return evaluateArrayLiteral(node, currentEnv);
       case "ArrayAccess":
         return evaluateArrayAccess(node, currentEnv);
       case "PropertyAccess":
@@ -52,6 +52,15 @@ function interpret(ast, env = {}) {
       default:
         throw new Error(`Unknown AST node type: ${node.type}`);
     }
+  }
+
+  function evaluateArrayLiteral(node, currentEnv) {
+    return node.elements.reduce((acc, element) => {
+      if (element.type === "SpreadElement") {
+        return [...acc, ...evaluate(element.argument, currentEnv)];
+      }
+      return [...acc, evaluate(element, currentEnv)];
+    }, []);
   }
 
   function evaluateArrayAccess(node, currentEnv) {
