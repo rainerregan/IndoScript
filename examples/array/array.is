@@ -1,4 +1,5 @@
 atur array = [0, 1, 2, 4]
 
+// Push
 cetak(array)
-cetak(array[2])
+cetak(array.dorong(8))

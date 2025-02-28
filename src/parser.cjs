@@ -27,6 +27,9 @@ function parse(tokens) {
       } else if (token === "[") {
         if (DEBUG_MODE) console.log("Array access detected", expr); // 🛠 Debugging
         expr = parseArrayAccess(expr);
+      } else if (token === ".") {
+        if (DEBUG_MODE) console.log("Property access detected", expr); // 🛠 Debugging
+        expr = parsePropertyAccess(expr);
       } else if (token === ";") {
         index++;
         break;
@@ -85,6 +88,29 @@ function parse(tokens) {
     const indexExpr = parseExpression();
     if (tokens[index++] !== "]") throw new Error("Expected closing ']'");
     return { type: "ArrayAccess", array, index: indexExpr };
+  }
+
+  function parsePropertyAccess(object) {
+    index++; // Skip '.'
+    const property = tokens[index++];
+    if (property === "panjang") {
+      return { type: "PropertyAccess", object, property: "length" };
+    } else if (property === "dorong") {
+      return parseMethodCall(object, "push");
+    } else {
+      throw new Error(`Unknown property: ${property}`);
+    }
+  }
+
+  function parseMethodCall(object, method) {
+    if (tokens[index++] !== "(") throw new Error("Expected '(' after method name");
+    const args = [];
+    while (tokens[index] !== ")" && index < tokens.length) {
+      args.push(parseExpression());
+      if (tokens[index] === ",") index++;
+    }
+    if (tokens[index++] !== ")") throw new Error("Expected closing ')'");
+    return { type: "MethodCall", object, method, arguments: args };
   }
 
   function parseStatement() {

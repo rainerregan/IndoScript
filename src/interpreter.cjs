@@ -21,6 +21,10 @@ function interpret(ast, env = {}) {
         return node.elements.map(element => evaluate(element, currentEnv));
       case "ArrayAccess":
         return evaluateArrayAccess(node, currentEnv);
+      case "PropertyAccess":
+        return evaluatePropertyAccess(node, currentEnv);
+      case "MethodCall":
+        return evaluateMethodCall(node, currentEnv);
       case "Identifier":
         return evaluateIdentifier(node, currentEnv);
       case "VariableDeclaration":
@@ -57,6 +61,30 @@ function interpret(ast, env = {}) {
       throw new Error(`'${node.array.name}' is not an array`);
     }
     return array[index];
+  }
+
+  function evaluatePropertyAccess(node, currentEnv) {
+    const object = evaluate(node.object, currentEnv);
+    if (node.property === "length") {
+      if (!Array.isArray(object)) {
+        throw new Error(`'${node.object.name}' is not an array`);
+      }
+      return object.length;
+    }
+    throw new Error(`Unknown property: ${node.property}`);
+  }
+
+  function evaluateMethodCall(node, currentEnv) {
+    const object = evaluate(node.object, currentEnv);
+    const args = node.arguments.map(arg => evaluate(arg, currentEnv));
+    if (node.method === "push") {
+      if (!Array.isArray(object)) {
+        throw new Error(`'${node.object.name}' is not an array`);
+      }
+      
+      return [...object, ...args];
+    }
+    throw new Error(`Unknown method: ${node.method}`);
   }
 
   function evaluateIdentifier(node, currentEnv) {
