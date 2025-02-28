@@ -77,6 +77,12 @@ function tokenize(code) {
       continue;
     }
 
+    if (isKeyword(code, i, "bukan")) {
+      tokens.push("!=");
+      i += 5;
+      continue;
+    }
+
     if (/[A-Za-z_]/.test(char)) {
       tokens.push(readIdentifier(code, i));
       i += tokens[tokens.length - 1].length;

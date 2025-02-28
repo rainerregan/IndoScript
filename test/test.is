@@ -66,3 +66,16 @@ atur false = g == h;
 
 tampilkan(true);
 tampilkan(false);
+
+// Testing Bukan
+tampilkan("Testing 6: Test Bukan");
+
+atur j = 5;
+atur k = 3;
+
+jika (j bukan k) {
+  tampilkan("j is not equal to k");
+} lainnya {
+  tampilkan("j is equal to k");
+}
+// Output: j is not equal to k
