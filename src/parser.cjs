@@ -10,12 +10,16 @@ function parse(tokens) {
     recursionDepth++;
 
     let expr = parsePrimaryExpression();
+    if (DEBUG_MODE) console.log("Parsed primary expression", expr); // 🛠 Debugging
     if (!expr) throw new Error(`Invalid expression at position ${index - 1}`);
 
     while (index < tokens.length) {
       const token = tokens[index];
 
+      if (DEBUG_MODE) console.log(`Parsing token: '${token}' at position ${index}`); // 🛠 Debugging
+
       if (token === "(") {
+        if (DEBUG_MODE) console.log("Function call detected", expr); // 🛠 Debugging
         expr = parseFunctionCall(expr);
       } else if (isBinaryOperator(token)) {
         expr = parseBinaryExpression(expr, token);
@@ -83,6 +87,10 @@ function parse(tokens) {
       return { type: "ReturnStatement", expression: expr };
     }
 
+    if (token === "jika") {
+      return parseIfStatement();
+    }
+
     // ✅ Handle function call
     if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/) && tokens[index] === "(") {
       index--; // Move back to reprocess as expression
@@ -142,8 +150,36 @@ function parse(tokens) {
     return { type: "FunctionDeclaration", name, params, body };
   }
 
+  function parseIfStatement() {
+    if (tokens[index++] !== "(") throw new Error("Expected '(' after 'jika'");
+    const test = parseExpression();
+    if (tokens[index++] !== ")") throw new Error("Expected ')' after condition");
+
+    if (tokens[index++] !== "{") throw new Error("Expected '{' after condition");
+    const consequent = [];
+    while (tokens[index] !== "}" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) consequent.push(stmt);
+    }
+    if (tokens[index] === "}") index++;
+
+    let alternate = null;
+    if (tokens[index] === "kalau_tidak") {
+      index++;
+      if (tokens[index++] !== "{") throw new Error("Expected '{' after 'kalau_tidak'");
+      alternate = [];
+      while (tokens[index] !== "}" && index < tokens.length) {
+        const stmt = parseStatement();
+        if (stmt) alternate.push(stmt);
+      }
+      if (tokens[index] === "}") index++;
+    }
+
+    return { type: "IfStatement", test, consequent, alternate };
+  }
+
   function isBinaryOperator(token) {
-    return ["+", "-", "*", "/", "==", "!=", ">=", "<="].includes(token);
+    return ["+", "-", "*", "/", "==", "!=", ">=", "<=", ">", "<"].includes(token);
   }
 
   const ast = { type: "Program", body: [] };

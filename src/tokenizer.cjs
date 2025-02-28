@@ -45,6 +45,18 @@ function tokenize(code) {
       continue;
     }
 
+    if (isKeyword(code, i, "jika")) {
+      tokens.push("jika");
+      i += 4;
+      continue;
+    }
+
+    if (isKeyword(code, i, "kalau_tidak")) {
+      tokens.push("kalau_tidak");
+      i += 11;
+      continue;
+    }
+
     tokens.push(char);
     i++;
   }
@@ -92,6 +104,10 @@ function readStringLiteral(code, i) {
 
 function isSingleCharToken(char) {
   return ["+", "-", "*", "/", "(", ")", "{", "}", ",", ";"].includes(char);
+}
+
+function isKeyword(code, i, keyword) {
+  return keyword.split("").every((c, j) => code[i + j] === c);
 }
 
 module.exports = tokenize;

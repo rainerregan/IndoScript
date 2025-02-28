@@ -31,6 +31,8 @@ function interpret(ast, env = {}) {
         return evaluate(node.expression, currentEnv);
       case "ReturnStatement":
         return evaluate(node.expression, currentEnv);
+      case "IfStatement":
+        return evaluateIfStatement(node, currentEnv);
       default:
         throw new Error(`Unknown AST node type: ${node.type}`);
     }
@@ -75,6 +77,10 @@ function interpret(ast, env = {}) {
         return left >= right;
       case "<=":
         return left <= right;
+      case ">":
+        return left > right;
+      case "<":
+        return left < right;
       default:
         throw new Error(`Unknown operator: ${node.operator}`);
     }
@@ -113,6 +119,20 @@ function interpret(ast, env = {}) {
       params: node.params,
       body: node.body,
     };
+    return null;
+  }
+
+  function evaluateIfStatement(node, currentEnv) {
+    const test = evaluate(node.test, currentEnv);
+    if (test) {
+      for (const statement of node.consequent) {
+        evaluate(statement, currentEnv);
+      }
+    } else if (node.alternate) {
+      for (const statement of node.alternate) {
+        evaluate(statement, currentEnv);
+      }
+    }
     return null;
   }
 
