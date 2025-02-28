@@ -1,5 +1,5 @@
 // A. Testing Variables
-tampilkan("Testing 1: Test Variables");
+cetak("Testing 1: Test Variables");
 atur a = 0;
 atur b = 0;
 
@@ -9,12 +9,12 @@ b = 3;
 a = a + b; // 5
 b = b + 5; // 8
 
-tampilkan(a);
-tampilkan(b);
+cetak(a);
+cetak(b);
 // Output: 5 8
 
 // B. Testing If-Else
-tampilkan("Testing 2: Test If-Else");
+cetak("Testing 2: Test If-Else");
 atur c = 0;
 atur d = 0;
 
@@ -22,16 +22,16 @@ c = 2;
 d = 3;
 
 jika (c == 2) {
-  tampilkan("c is 2");
+  cetak("c is 2");
 } dan jika (d == 3) {
-  tampilkan("d is 3");
+  cetak("d is 3");
 } lainnya {
-  tampilkan("c is not 2 and d is not 3");
+  cetak("c is not 2 and d is not 3");
 }
 // Output: c is 2 d is 3
 
 // Testing Function
-tampilkan("Testing 3: Test Function");
+cetak("Testing 3: Test Function");
 
 fungsi abc(a, b) {
   kembalikan a + b;
@@ -43,20 +43,20 @@ atur f = 0;
 e = 2;
 f = 3;
 
-tampilkan(abc(e, f));
+cetak(abc(e, f));
 
 // Testing Loop
-tampilkan("Testing 4: Test Loop");
+cetak("Testing 4: Test Loop");
 
 atur i = 0;
 
 selama (i < 5) {
-  tampilkan(i);
+  cetak(i);
   i = i + 1;
 }
 
 // Testing Boolean
-tampilkan("Testing 5: Test Boolean");
+cetak("Testing 5: Test Boolean");
 
 atur g = benar;
 atur h = salah;
@@ -64,37 +64,37 @@ atur h = salah;
 atur true = g != h;
 atur false = g == h;
 
-tampilkan(true);
-tampilkan(false);
+cetak(true);
+cetak(false);
 
 // Testing Bukan
-tampilkan("Testing 6: Test Bukan");
+cetak("Testing 6: Test Bukan");
 
 atur j = 5;
 atur k = 3;
 
 jika (j dan k) {
-  tampilkan("j is not equal to k");
+  cetak("j is not equal to k");
 } lainnya {
-  tampilkan("j is equal to k");
+  cetak("j is equal to k");
 }
 // Output: j is not equal to k
 
 // Test Dan & Atau
-tampilkan("Testing 7: Test Dan & Atau");
+cetak("Testing 7: Test Dan & Atau");
 
-tampilkan(benar dan salah);
-tampilkan(salah dan salah);
-tampilkan(benar dan benar);
+cetak(benar dan salah);
+cetak(salah dan salah);
+cetak(benar dan benar);
 
 // Test Binary Operator
-tampilkan("Testing 8: Test Operator");
+cetak("Testing 8: Test Operator");
 
-tampilkan(2 + 3);
-tampilkan(2 - 3);
+cetak(2 + 3);
+cetak(2 - 3);
 
-tampilkan(10 > 10);
-tampilkan(10 >= 10);
+cetak(10 > 10);
+cetak(10 >= 10);
 
-tampilkan(10 < 10);
-tampilkan(10 <= 10);
+cetak(10 < 10);
+cetak(10 <= 10);

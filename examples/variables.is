@@ -1,4 +1,4 @@
 atur a = 10;
 atur b = 5;
 
-tampilkan a + b;
+cetak a + b;

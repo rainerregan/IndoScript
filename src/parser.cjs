@@ -77,7 +77,7 @@ function parse(tokens) {
       return parseVariableDeclaration();
     }
 
-    if (token === "tampilkan") {
+    if (token === "cetak") {
       const expr = parseExpression();
       return { type: "PrintStatement", expression: expr };
     }

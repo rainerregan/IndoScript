@@ -1,7 +1,7 @@
 atur a = 10;
 
 jika (a > 5) {
-    tampilkan "a lebih besar dari 5";
+    cetak "a lebih besar dari 5";
 } lainnya {
-    tampilkan "a lebih kecil dari 5";
+    cetak "a lebih kecil dari 5";
 }

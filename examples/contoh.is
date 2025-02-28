@@ -3,4 +3,4 @@ fungsi tambah(a, b) {
 }
 
 atur hasil = tambah(5, tambah(1, 2));
-tampilkan(hasil);
+cetak(hasil);
