@@ -79,3 +79,10 @@ jika (j dan k) {
   tampilkan("j is equal to k");
 }
 // Output: j is not equal to k
+
+// Test Dan & Atau
+tampilkan("Testing 7: Test Dan & Atau");
+
+tampilkan(benar dan salah);
+tampilkan(salah dan salah);
+tampilkan(benar dan benar);
