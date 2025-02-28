@@ -86,3 +86,15 @@ tampilkan("Testing 7: Test Dan & Atau");
 tampilkan(benar dan salah);
 tampilkan(salah dan salah);
 tampilkan(benar dan benar);
+
+// Test Binary Operator
+tampilkan("Testing 8: Test Operator");
+
+tampilkan(2 + 3);
+tampilkan(2 - 3);
+
+tampilkan(10 > 10);
+tampilkan(10 >= 10);
+
+tampilkan(10 < 10);
+tampilkan(10 <= 10);
