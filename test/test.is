@@ -1,0 +1,29 @@
+// A. Testing Variables
+tampilkan("Testing 1: Test Variables");
+atur a = 0;
+atur b = 0;
+
+a = 2;
+b = 3;
+
+a = a + b; // 5
+b = b + 5; // 8
+
+tampilkan a;
+tampilkan b;
+// Output: 5 8
+
+
+// B. Testing If-Else
+tampilkan("Testing 2: Test If-Else");
+atur c = 0;
+atur d = 0;
+
+c = 2;
+d = 3;
+
+jika (c == 2) {
+  tampilkan "c is 2";
+} lainnya {
+  tampilkan "c is not 2";
+}

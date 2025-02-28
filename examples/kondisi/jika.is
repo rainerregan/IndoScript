@@ -2,6 +2,6 @@ atur a = 10;
 
 jika (a > 5) {
     tampilkan "a lebih besar dari 5";
-} kalau_tidak {
+} lainnya {
     tampilkan "a lebih kecil dari 5";
 }

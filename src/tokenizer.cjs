@@ -53,8 +53,8 @@ function tokenize(code) {
       continue;
     }
 
-    if (isKeyword(code, i, "kalau_tidak")) {
-      tokens.push("kalau_tidak");
+    if (isKeyword(code, i, "lainnya")) {
+      tokens.push("lainnya");
       i += 11;
       continue;
     }

@@ -178,9 +178,9 @@ function parse(tokens) {
     if (tokens[index] === "}") index++;
 
     let alternate = null;
-    if (tokens[index] === "kalau_tidak") {
+    if (tokens[index] === "lainnya") {
       index++;
-      if (tokens[index++] !== "{") throw new Error("Expected '{' after 'kalau_tidak'");
+      if (tokens[index++] !== "{") throw new Error("Expected '{' after 'lainnya'");
       alternate = [];
       while (tokens[index] !== "}" && index < tokens.length) {
         const stmt = parseStatement();
