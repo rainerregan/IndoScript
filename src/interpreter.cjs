@@ -39,6 +39,8 @@ function interpret(ast, env = {}) {
         return evaluateIfStatement(node, currentEnv);
       case "WhileStatement":
         return evaluateWhileStatement(node, currentEnv);
+      case "ForStatement":
+        return evaluateForStatement(node, currentEnv);
       default:
         throw new Error(`Unknown AST node type: ${node.type}`);
     }
@@ -156,6 +158,15 @@ function interpret(ast, env = {}) {
 
   function evaluateWhileStatement(node, currentEnv) {
     while (evaluate(node.test, currentEnv)) {
+      for (const statement of node.body) {
+        evaluate(statement, currentEnv);
+      }
+    }
+    return null;
+  }
+
+  function evaluateForStatement(node, currentEnv) {
+    for (evaluate(node.init, currentEnv); evaluate(node.test, currentEnv); evaluate(node.update, currentEnv)) {
       for (const statement of node.body) {
         evaluate(statement, currentEnv);
       }

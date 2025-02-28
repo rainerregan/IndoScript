@@ -1,6 +1,6 @@
 let recursionDepth = 0;
 const MAX_DEPTH = 1000; // Prevent infinite recursion
-const DEBUG_MODE = process.env.DEBUG_MODE === "true";
+const DEBUG_MODE = true;
 
 function parse(tokens) {
   let index = 0;
@@ -99,6 +99,10 @@ function parse(tokens) {
       return parseWhileStatement();
     }
 
+    if (token === "untuk") {
+      return parseForStatement();
+    }
+
     if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) {
       if (tokens[index] === "=") {
         return parseAssignmentStatement(token);
@@ -134,6 +138,7 @@ function parse(tokens) {
 
   function parseVariableDeclaration() {
     const name = tokens[index++];
+    console.log("Name:", name);
     if (tokens[index++] !== "=") {
       console.error("Tokens before error:", tokens.slice(index - 5, index + 5));
       throw new Error("Expected '=' after variable name");
@@ -212,6 +217,38 @@ function parse(tokens) {
     if (tokens[index] === "}") index++;
 
     return { type: "WhileStatement", test, body };
+  }
+
+  function parseForLoopUpdate() {
+    // read the ...,....,l = l + 1 part like a function body
+    const body = [];
+    while (tokens[index] !== ")" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) body.push(stmt);
+    }
+    return body[0];
+  }
+
+  function parseForStatement() {
+    if (tokens[index++] !== "(") throw new Error("Expected '(' after 'untuk'");
+    index++; // Skip 'var'
+    let init = parseVariableDeclaration();
+    const test = parseExpression();
+    index--; // Move back to reprocess as expression
+    if (tokens[index++] !== ";") throw new Error("Expected ';' after test expression");
+    const update = parseForLoopUpdate();
+    if (tokens[index++] !== ")") throw new Error("Expected ')' after update expression");
+    if (tokens[index++] !== "{") throw new Error("Expected '{' after condition");
+    
+    // read the body of the for loop
+    const body = [];
+    while (tokens[index] !== "}" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) body.push(stmt);
+    }
+    if (tokens[index] === "}") index++;
+
+    return { type: "ForStatement", init, test, update, body };
   }
 
   function isBinaryOperator(token) {

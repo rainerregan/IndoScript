@@ -1,4 +1,4 @@
-const DEBUG_MODE = process.env.DEBUG_MODE === "true";
+const DEBUG_MODE = true;
 
 function tokenize(code) {
   const tokens = [];
@@ -62,6 +62,12 @@ function tokenize(code) {
     if (isKeyword(code, i, "selama")) {
       tokens.push("selama");
       i += 6;
+      continue;
+    }
+
+    if (isKeyword(code, i, "untuk")) {
+      tokens.push("untuk");
+      i += 5;
       continue;
     }
 

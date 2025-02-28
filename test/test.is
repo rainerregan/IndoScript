@@ -98,3 +98,10 @@ cetak(10 >= 10);
 
 cetak(10 < 10);
 cetak(10 <= 10);
+
+// Test for Loop
+cetak("Testing 9: Test For Loop");
+
+untuk (atur l = 0; l < 5; l = l + 1) {
+  cetak(l);
+}
