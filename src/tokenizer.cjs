@@ -17,12 +17,6 @@ function tokenize(code) {
       continue;
     }
 
-    if (/[A-Za-z_]/.test(char)) {
-      tokens.push(readIdentifier(code, i));
-      i += tokens[tokens.length - 1].length;
-      continue;
-    }
-
     if (/[0-9]/.test(char)) {
       tokens.push(readNumber(code, i));
       i += tokens[tokens.length - 1].length;
@@ -53,15 +47,27 @@ function tokenize(code) {
       continue;
     }
 
+    if (isKeyword(code, i, "dan jika")) {
+      tokens.push("dan jika");
+      i += 8;
+      continue;
+    }
+
     if (isKeyword(code, i, "lainnya")) {
       tokens.push("lainnya");
-      i += 11;
+      i += 7;
       continue;
     }
 
     if (isKeyword(code, i, "selama")) {
       tokens.push("selama");
       i += 6;
+      continue;
+    }
+
+    if (/[A-Za-z_]/.test(char)) {
+      tokens.push(readIdentifier(code, i));
+      i += tokens[tokens.length - 1].length;
       continue;
     }
 

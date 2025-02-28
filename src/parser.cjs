@@ -178,7 +178,10 @@ function parse(tokens) {
     if (tokens[index] === "}") index++;
 
     let alternate = null;
-    if (tokens[index] === "lainnya") {
+    if (tokens[index] === "dan jika") {
+      index++;
+      alternate = parseIfStatement();
+    } else if (tokens[index] === "lainnya") {
       index++;
       if (tokens[index++] !== "{") throw new Error("Expected '{' after 'lainnya'");
       alternate = [];

@@ -9,10 +9,9 @@ b = 3;
 a = a + b; // 5
 b = b + 5; // 8
 
-tampilkan a;
-tampilkan b;
+tampilkan(a);
+tampilkan(b);
 // Output: 5 8
-
 
 // B. Testing If-Else
 tampilkan("Testing 2: Test If-Else");
@@ -23,7 +22,25 @@ c = 2;
 d = 3;
 
 jika (c == 2) {
-  tampilkan "c is 2";
+  tampilkan("c is 2");
+} dan jika (d == 3) {
+  tampilkan("d is 3");
 } lainnya {
-  tampilkan "c is not 2";
+  tampilkan("c is not 2 and d is not 3");
 }
+// Output: c is 2 d is 3
+
+// Testing Function
+tampilkan("Testing 3: Test Function");
+
+fungsi abc(a, b) {
+  kembali a + b;
+}
+
+atur e = 0;
+atur f = 0;
+
+e = 2;
+f = 3;
+
+tampilkan(abc(e, f));
