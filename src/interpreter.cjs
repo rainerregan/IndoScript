@@ -98,16 +98,21 @@ function interpret(ast, env = {}) {
       }
 
       return [...object, ...args];
-    } else if (node.method === "forEach") {
+    } else if (node.method === "forEach" || node.method === "untukSetiap") {
       if (!Array.isArray(object)) {
         throw new Error(`'${node.object.name}' is not an array`);
       }
       const callback = args[0];
-      if (typeof callback !== "function") {
-        throw new Error(`'${callback}' is not a function`);
+      if (typeof callback !== "function" && callback.type !== "ArrowFunction") {
+        throw new Error(`'${callback}' is not a function or arrow function`);
       }
       object.forEach((item, index) => {
-        callback(item, index);
+        if (callback.type === "ArrowFunction") {
+          const localEnv = { ...currentEnv, [callback.params[0]]: item, [callback.params[1]]: index };
+          callback.body.forEach(statement => evaluate(statement, localEnv));
+        } else {
+          callback(item, index);
+        }
       });
       return null;
     }

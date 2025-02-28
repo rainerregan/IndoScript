@@ -66,6 +66,10 @@ function parse(tokens) {
       const expr = parseExpression();
       if (tokens[index] !== ")") throw new Error("Expected closing ')'");
       index++;
+      if (tokens[index] === "=>") {
+        return parseArrowFunction(expr);
+      }
+
       return expr;
     }
 
@@ -103,6 +107,7 @@ function parse(tokens) {
     } else if (property === "dorong") {
       return parseMethodCall(object, "push");
     } else if (property === "untukSetiap") {
+      console.log("Parsing forEach method call");
       return parseMethodCall(object, "forEach");
     } else {
       throw new Error(`Unknown property: ${property}`);
@@ -112,18 +117,40 @@ function parse(tokens) {
   function parseMethodCall(object, method) {
     if (tokens[index++] !== "(") throw new Error("Expected '(' after method name");
     const args = [];
-    if (method === "forEach") {
-      console.log("Parsing forEach method call");
-      index++; // Skip 'fungsi'
-      args.push(parseFunctionDeclaration());
-    } else {
-      while (tokens[index] !== ")" && index < tokens.length) {
+    while (tokens[index] !== ")" && index < tokens.length) {
+      if (tokens[index] === "(") {
+        const arrowFunctionParams = parseArrowFunctionParams();
+        args.push(parseArrowFunction(arrowFunctionParams));
+      } else {
         args.push(parseExpression());
-        if (tokens[index] === ",") index++;
       }
+      if (tokens[index] === ",") index++;
     }
     if (tokens[index++] !== ")") throw new Error("Expected closing ')'");
     return { type: "MethodCall", object, method, arguments: args };
+  }
+
+  function parseArrowFunctionParams() {
+    if (tokens[index++] !== "(") throw new Error("Expected '(' in arrow function");
+    const params = [];
+    while (tokens[index] !== ")" && index < tokens.length) {
+      params.push(tokens[index++]);
+      if (tokens[index] === ",") index++;
+    }
+    if (tokens[index++] !== ")") throw new Error("Expected ')' in arrow function");
+    return params;
+  }
+
+  function parseArrowFunction(params) {
+    if (tokens[index++] !== "=>") throw new Error("Expected '=>' in arrow function");
+    if (tokens[index++] !== "{") throw new Error("Expected '{' in arrow function");
+    const body = [];
+    while (tokens[index] !== "}" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) body.push(stmt);
+    }
+    if (tokens[index] === "}") index++;
+    return { type: "ArrowFunction", params, body };
   }
 
   function parseStatement() {
@@ -197,9 +224,6 @@ function parse(tokens) {
     }
     if (tokens[index] !== ")") throw new Error("Expected closing ')'");
     index++;
-    // if (tokens[index] === "=>") {
-    //   return parseArrowFunction(callee);
-    // }
     return { type: "FunctionCall", callee, arguments: args };
   }
 
@@ -249,21 +273,6 @@ function parse(tokens) {
     const parsed = { type: "FunctionDeclaration", name, params, body };
     console.log("Parsed function declaration:", parsed);
     return parsed;
-  }
-
-  function parseArrowFunction(params) {
-    if (tokens[index++] !== "=>") throw new Error("Expected '=>' in arrow function");
-
-    console.log("Arrow function params:", params);
-
-    if (tokens[index++] !== "{") throw new Error("Expected '{' in arrow function");
-    const body = [];
-    while (tokens[index] !== "}" && index < tokens.length) {
-      const stmt = parseStatement();
-      if (stmt) body.push(stmt);
-    }
-    if (tokens[index] === "}") index++;
-    return { type: "ArrowFunction", params, body };
   }
 
   function parseIfStatement() {
