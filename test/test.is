@@ -34,7 +34,7 @@ jika (c == 2) {
 tampilkan("Testing 3: Test Function");
 
 fungsi abc(a, b) {
-  kembali a + b;
+  kembalikan a + b;
 }
 
 atur e = 0;

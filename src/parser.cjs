@@ -27,7 +27,7 @@ function parse(tokens) {
       } else if (token === ";") {
         index++;
         break;
-      } else if (token === "kembali") {
+      } else if (token === "kembalikan") {
         index++;
         expr = { type: "ReturnStatement", expression: expr };
         break;
@@ -83,7 +83,7 @@ function parse(tokens) {
       return parseFunctionDeclaration();
     }
 
-    if (token === "kembali") {
+    if (token === "kembalikan") {
       const expr = parseExpression();
       return { type: "ReturnStatement", expression: expr };
     }
