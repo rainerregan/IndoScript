@@ -19,6 +19,8 @@ function interpret(ast, env = {}) {
         return node.value;
       case "ArrayLiteral":
         return node.elements.map(element => evaluate(element, currentEnv));
+      case "ArrayAccess":
+        return evaluateArrayAccess(node, currentEnv);
       case "Identifier":
         return evaluateIdentifier(node, currentEnv);
       case "VariableDeclaration":
@@ -46,6 +48,15 @@ function interpret(ast, env = {}) {
       default:
         throw new Error(`Unknown AST node type: ${node.type}`);
     }
+  }
+
+  function evaluateArrayAccess(node, currentEnv) {
+    const array = evaluate(node.array, currentEnv);
+    const index = evaluate(node.index, currentEnv);
+    if (!Array.isArray(array)) {
+      throw new Error(`'${node.array.name}' is not an array`);
+    }
+    return array[index];
   }
 
   function evaluateIdentifier(node, currentEnv) {

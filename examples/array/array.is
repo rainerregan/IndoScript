@@ -1,3 +1,4 @@
 atur array = [0, 1, 2, 4]
 
 cetak(array)
+cetak(array[2])

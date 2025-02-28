@@ -24,6 +24,9 @@ function parse(tokens) {
       } else if (isBinaryOperator(token)) {
         if (DEBUG_MODE) console.log("Binary operator detected", expr); // 🛠 Debugging
         expr = parseBinaryExpression(expr, token);
+      } else if (token === "[") {
+        if (DEBUG_MODE) console.log("Array access detected", expr); // 🛠 Debugging
+        expr = parseArrayAccess(expr);
       } else if (token === ";") {
         index++;
         break;
@@ -75,6 +78,13 @@ function parse(tokens) {
     if (tokens[index] !== "]") throw new Error("Expected closing ']'");
     index++;
     return { type: "ArrayLiteral", elements };
+  }
+
+  function parseArrayAccess(array) {
+    index++; // Skip '['
+    const indexExpr = parseExpression();
+    if (tokens[index++] !== "]") throw new Error("Expected closing ']'");
+    return { type: "ArrayAccess", array, index: indexExpr };
   }
 
   function parseStatement() {
