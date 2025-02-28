@@ -193,7 +193,7 @@ function interpret(ast, env = {}) {
     });
 
     let result = null;
-    if (DEBUG_MODE) console.log(`Executing function '${node.callee.name}'`, localEnv);
+    if (DEBUG_MODE) console.log(`Executing function`, localEnv);
     for (const statement of func.body) {
       if (statement.type === "ReturnStatement") {
         result = evaluate(statement.expression, localEnv);
@@ -216,7 +216,7 @@ function interpret(ast, env = {}) {
   }
 
   function evaluateArrowFunction(node, currentEnv) {
-    if (DEBUG_MODE) console.log(`Declaring arrow function '${node.name}'`, node.params, node.body);
+    if (DEBUG_MODE) console.log(`Declaring arrow function`, node.params, node.body);
     return {
       type: "ArrowFunction",
       params: node.params,
