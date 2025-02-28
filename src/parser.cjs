@@ -102,6 +102,8 @@ function parse(tokens) {
       return { type: "PropertyAccess", object, property: "length" };
     } else if (property === "dorong") {
       return parseMethodCall(object, "push");
+    } else if (property === "untukSetiap") {
+      return parseMethodCall(object, "forEach");
     } else {
       throw new Error(`Unknown property: ${property}`);
     }
@@ -156,6 +158,10 @@ function parse(tokens) {
 
     if (token === "untuk") {
       return parseForStatement();
+    }
+
+    if (token === "untukSetiap") {
+      return parseForEachStatement();
     }
 
     if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) {
@@ -304,6 +310,24 @@ function parse(tokens) {
     if (tokens[index] === "}") index++;
 
     return { type: "ForStatement", init, test, update, body };
+  }
+
+  function parseForEachStatement() {
+    if (tokens[index++] !== "(") throw new Error("Expected '(' after 'untukSetiap'");
+    const element = tokens[index++];
+    if (tokens[index++] !== "dalam") throw new Error("Expected 'dalam' after element");
+    const array = parseExpression();
+    if (tokens[index++] !== ")") throw new Error("Expected ')' after array expression");
+
+    if (tokens[index++] !== "{") throw new Error("Expected '{' after condition");
+    const body = [];
+    while (tokens[index] !== "}" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) body.push(stmt);
+    }
+    if (tokens[index] === "}") index++;
+
+    return { type: "ForEachStatement", element, array, body };
   }
 
   function isBinaryOperator(token) {

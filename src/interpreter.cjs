@@ -49,6 +49,8 @@ function interpret(ast, env = {}) {
         return evaluateWhileStatement(node, currentEnv);
       case "ForStatement":
         return evaluateForStatement(node, currentEnv);
+      case "ForEachStatement":
+        return evaluateForEachStatement(node, currentEnv);
       default:
         throw new Error(`Unknown AST node type: ${node.type}`);
     }
@@ -90,8 +92,20 @@ function interpret(ast, env = {}) {
       if (!Array.isArray(object)) {
         throw new Error(`'${node.object.name}' is not an array`);
       }
-      
+
       return [...object, ...args];
+    } else if (node.method === "forEach") {
+      if (!Array.isArray(object)) {
+        throw new Error(`'${node.object.name}' is not an array`);
+      }
+      const callback = args[0];
+      if (typeof callback !== "function") {
+        throw new Error(`'${callback}' is not a function`);
+      }
+      object.forEach((item, index) => {
+        callback(item, index);
+      });
+      return null;
     }
     throw new Error(`Unknown method: ${node.method}`);
   }
@@ -219,6 +233,21 @@ function interpret(ast, env = {}) {
     for (evaluate(node.init, currentEnv); evaluate(node.test, currentEnv); evaluate(node.update, currentEnv)) {
       for (const statement of node.body) {
         evaluate(statement, currentEnv);
+      }
+    }
+    return null;
+  }
+
+  function evaluateForEachStatement(node, currentEnv) {
+    const array = evaluate(node.array, currentEnv);
+    if (!Array.isArray(array)) {
+      throw new Error(`'${node.array.name}' is not an array`);
+    }
+    const localEnv = { ...currentEnv };
+    for (const element of array) {
+      localEnv[node.element] = element;
+      for (const statement of node.body) {
+        evaluate(statement, localEnv);
       }
     }
     return null;

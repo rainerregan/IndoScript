@@ -65,6 +65,12 @@ function tokenize(code) {
       continue;
     }
 
+    if (isKeyword(code, i, "untukSetiap")) {
+      tokens.push("untukSetiap");
+      i += 11;
+      continue;
+    }
+
     if (isKeyword(code, i, "untuk")) {
       tokens.push("untuk");
       i += 5;
