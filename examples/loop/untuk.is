@@ -1,3 +1,6 @@
-untuk (atur l = 0; l < 5; l = l + 1) {
-  cetak(l);
+atur a = 1;
+
+untuk (atur l = 1; l < 5; l = l + 1) {
+  cetak(a);
+  a = a * l;
 }
