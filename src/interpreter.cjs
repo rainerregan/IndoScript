@@ -15,6 +15,8 @@ function interpret(ast, env = {}) {
         return node.value;
       case "StringLiteral":
         return node.value;
+      case "BooleanLiteral":
+        return node.value;
       case "Identifier":
         return evaluateIdentifier(node, currentEnv);
       case "VariableDeclaration":

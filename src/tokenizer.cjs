@@ -65,6 +65,18 @@ function tokenize(code) {
       continue;
     }
 
+    if (isKeyword(code, i, "benar")) {
+      tokens.push({ type: "BooleanLiteral", value: true });
+      i += 5;
+      continue;
+    }
+
+    if (isKeyword(code, i, "salah")) {
+      tokens.push({ type: "BooleanLiteral", value: false });
+      i += 5;
+      continue;
+    }
+
     if (/[A-Za-z_]/.test(char)) {
       tokens.push(readIdentifier(code, i));
       i += tokens[tokens.length - 1].length;

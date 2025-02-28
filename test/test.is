@@ -54,3 +54,15 @@ selama (i < 5) {
   tampilkan(i);
   i = i + 1;
 }
+
+// Testing Boolean
+tampilkan("Testing 5: Test Boolean");
+
+atur g = benar;
+atur h = salah;
+
+atur true = g != h;
+atur false = g == h;
+
+tampilkan(true);
+tampilkan(false);

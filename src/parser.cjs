@@ -49,6 +49,9 @@ function parse(tokens) {
     if (typeof token === "object" && token.type === "StringLiteral") {
       return { type: "StringLiteral", value: token.value }; // ✅ Correctly process string literals
     }
+    if (typeof token === "object" && token.type === "BooleanLiteral") {
+      return { type: "BooleanLiteral", value: token.value }; // ✅ Correctly process boolean literals
+    }
     if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) return { type: "Identifier", name: token };
     if (token === "(") {
       const expr = parseExpression();
