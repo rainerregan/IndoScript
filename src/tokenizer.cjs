@@ -83,6 +83,18 @@ function tokenize(code) {
       continue;
     }
 
+    if (isKeyword(code, i, "dan")) {
+      tokens.push("&&");
+      i += 3;
+      continue;
+    }
+
+    if (isKeyword(code, i, "atau")) {
+      tokens.push("||");
+      i += 4;
+      continue;
+    }
+
     if (/[A-Za-z_]/.test(char)) {
       tokens.push(readIdentifier(code, i));
       i += tokens[tokens.length - 1].length;

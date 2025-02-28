@@ -73,7 +73,7 @@ tampilkan("Testing 6: Test Bukan");
 atur j = 5;
 atur k = 3;
 
-jika (j bukan k) {
+jika (j dan k) {
   tampilkan("j is not equal to k");
 } lainnya {
   tampilkan("j is equal to k");

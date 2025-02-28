@@ -215,7 +215,7 @@ function parse(tokens) {
   }
 
   function isBinaryOperator(token) {
-    return ["+", "-", "*", "/", "==", "!=", ">=", "<=", ">", "<"].includes(token);
+    return ["+", "-", "*", "/", "==", "!=", ">=", "<=", ">", "<", "&&", "||"].includes(token);
   }
 
   const ast = { type: "Program", body: [] };
