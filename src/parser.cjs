@@ -1,6 +1,6 @@
 let recursionDepth = 0;
 const MAX_DEPTH = 1000; // Prevent infinite recursion
-const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
+const DEBUG_MODE = process.env.DEBUG_MODE === "true";
 
 function parse(tokens) {
   let index = 0;
@@ -22,6 +22,7 @@ function parse(tokens) {
         if (DEBUG_MODE) console.log("Function call detected", expr); // 🛠 Debugging
         expr = parseFunctionCall(expr);
       } else if (isBinaryOperator(token)) {
+        if (DEBUG_MODE) console.log("Binary operator detected", expr); // 🛠 Debugging
         expr = parseBinaryExpression(expr, token);
       } else if (token === ";") {
         index++;
@@ -91,11 +92,18 @@ function parse(tokens) {
       return parseIfStatement();
     }
 
-    // ✅ Handle function call
-    if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/) && tokens[index] === "(") {
-      index--; // Move back to reprocess as expression
-      const expr = parseExpression();
-      return { type: "ExpressionStatement", expression: expr };
+    if (token === "selama") {
+      return parseWhileStatement();
+    }
+
+    if (token.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) {
+      if (tokens[index] === "=") {
+        return parseAssignmentStatement(token);
+      } else if (tokens[index] === "(") {
+        index--; // Move back to reprocess as expression
+        const expr = parseExpression();
+        return { type: "ExpressionStatement", expression: expr };
+      }
     }
 
     console.error("Unexpected token:", token); // 🛠 Debugging
@@ -129,6 +137,12 @@ function parse(tokens) {
     }
     const value = parseExpression();
     return { type: "VariableDeclaration", name, value };
+  }
+
+  function parseAssignmentStatement(name) {
+    index++; // Skip '='
+    const value = parseExpression();
+    return { type: "AssignmentStatement", name, value };
   }
 
   function parseFunctionDeclaration() {
@@ -178,6 +192,22 @@ function parse(tokens) {
     return { type: "IfStatement", test, consequent, alternate };
   }
 
+  function parseWhileStatement() {
+    if (tokens[index++] !== "(") throw new Error("Expected '(' after 'selama'");
+    const test = parseExpression();
+    if (tokens[index++] !== ")") throw new Error("Expected ')' after condition");
+
+    if (tokens[index++] !== "{") throw new Error("Expected '{' after condition");
+    const body = [];
+    while (tokens[index] !== "}" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) body.push(stmt);
+    }
+    if (tokens[index] === "}") index++;
+
+    return { type: "WhileStatement", test, body };
+  }
+
   function isBinaryOperator(token) {
     return ["+", "-", "*", "/", "==", "!=", ">=", "<=", ">", "<"].includes(token);
   }
@@ -189,6 +219,9 @@ function parse(tokens) {
       ast.body.push(stmt);
     }
   }
+
+  if (DEBUG_MODE) console.log("AST:", JSON.stringify(ast, null, 2)); // 🛠 Debugging
+
   return ast;
 }
 

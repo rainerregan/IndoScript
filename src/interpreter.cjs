@@ -19,6 +19,8 @@ function interpret(ast, env = {}) {
         return evaluateIdentifier(node, currentEnv);
       case "VariableDeclaration":
         return evaluateVariableDeclaration(node, currentEnv);
+      case "AssignmentStatement":
+        return evaluateAssignmentStatement(node, currentEnv);
       case "PrintStatement":
         return evaluatePrintStatement(node, currentEnv);
       case "BinaryExpression":
@@ -33,6 +35,8 @@ function interpret(ast, env = {}) {
         return evaluate(node.expression, currentEnv);
       case "IfStatement":
         return evaluateIfStatement(node, currentEnv);
+      case "WhileStatement":
+        return evaluateWhileStatement(node, currentEnv);
       default:
         throw new Error(`Unknown AST node type: ${node.type}`);
     }
@@ -48,6 +52,14 @@ function interpret(ast, env = {}) {
   }
 
   function evaluateVariableDeclaration(node, currentEnv) {
+    currentEnv[node.name] = evaluate(node.value, currentEnv);
+    return null;
+  }
+
+  function evaluateAssignmentStatement(node, currentEnv) {
+    if (!(node.name in currentEnv)) {
+      throw new Error(`Undefined variable: ${node.name}`);
+    }
     currentEnv[node.name] = evaluate(node.value, currentEnv);
     return null;
   }
@@ -130,6 +142,15 @@ function interpret(ast, env = {}) {
       }
     } else if (node.alternate) {
       for (const statement of node.alternate) {
+        evaluate(statement, currentEnv);
+      }
+    }
+    return null;
+  }
+
+  function evaluateWhileStatement(node, currentEnv) {
+    while (evaluate(node.test, currentEnv)) {
+      for (const statement of node.body) {
         evaluate(statement, currentEnv);
       }
     }

@@ -1,3 +1,5 @@
+const DEBUG_MODE = process.env.DEBUG_MODE === "true";
+
 function tokenize(code) {
   const tokens = [];
   let i = 0;
@@ -57,9 +59,17 @@ function tokenize(code) {
       continue;
     }
 
+    if (isKeyword(code, i, "selama")) {
+      tokens.push("selama");
+      i += 6;
+      continue;
+    }
+
     tokens.push(char);
     i++;
   }
+
+  if (DEBUG_MODE) console.log("Tokens:", tokens); // 🛠 Debugging
 
   return tokens;
 }

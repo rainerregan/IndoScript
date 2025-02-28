@@ -1,0 +1,6 @@
+atur a = 0;
+
+selama(a < 5) {
+  tampilkan a;
+  a = a + 1;
+}
