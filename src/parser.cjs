@@ -16,20 +16,9 @@ function parse(tokens) {
       const token = tokens[index];
 
       if (token === "(") {
-        index++; // ✅ Skip '('
-        const args = [];
-        while (tokens[index] !== ")" && index < tokens.length) {
-          args.push(parseExpression());
-          if (tokens[index] === ",") index++; // ✅ Handle multiple arguments
-        }
-        if (tokens[index] !== ")") throw new Error("Expected closing ')'");
-        index++; // ✅ Skip ')'
-        expr = { type: "FunctionCall", callee: expr, arguments: args };
-      } else if (["+", "-", "*", "/", "==", "!=", ">=", "<="].includes(token)) {
-        index++;
-        const right = parsePrimaryExpression();
-        if (!right) throw new Error(`Expected expression after '${token}'`);
-        expr = { type: "BinaryExpression", operator: token, left: expr, right };
+        expr = parseFunctionCall(expr);
+      } else if (isBinaryOperator(token)) {
+        expr = parseBinaryExpression(expr, token);
       } else if (token === ";") {
         index++;
         break;
@@ -77,13 +66,7 @@ function parse(tokens) {
     if (token === "}") return null; // 🚨 Can return null, which might cause issues
 
     if (token === "atur") {
-      const name = tokens[index++];
-      if (tokens[index++] !== "=") {
-        console.error("Tokens before error:", tokens.slice(index - 5, index + 5));
-        throw new Error("Expected '=' after variable name");
-      }
-      const value = parseExpression();
-      return { type: "VariableDeclaration", name, value };
+      return parseVariableDeclaration();
     }
 
     if (token === "tampilkan") {
@@ -92,22 +75,7 @@ function parse(tokens) {
     }
 
     if (token === "fungsi") {
-      const name = tokens[index++];
-      if (tokens[index++] !== "(") throw new Error("Expected '('");
-      const params = [];
-      while (tokens[index] !== ")") {
-        params.push(tokens[index++]);
-        if (tokens[index] === ",") index++;
-      }
-      index++; // Skip ')'
-      if (tokens[index++] !== "{") throw new Error("Expected '{'");
-      const body = [];
-      while (tokens[index] !== "}" && index < tokens.length) {
-        const stmt = parseStatement();
-        if (stmt) body.push(stmt);
-      }
-      if (tokens[index] === "}") index++; // ✅ Ensure '}' is skipped
-      return { type: "FunctionDeclaration", name, params, body };
+      return parseFunctionDeclaration();
     }
 
     if (token === "kembali") {
@@ -124,6 +92,58 @@ function parse(tokens) {
 
     console.error("Unexpected token:", token); // 🛠 Debugging
     throw new Error(`Unexpected statement: ${token}`);
+  }
+
+  function parseFunctionCall(callee) {
+    index++;
+    const args = [];
+    while (tokens[index] !== ")" && index < tokens.length) {
+      args.push(parseExpression());
+      if (tokens[index] === ",") index++;
+    }
+    if (tokens[index] !== ")") throw new Error("Expected closing ')'");
+    index++;
+    return { type: "FunctionCall", callee, arguments: args };
+  }
+
+  function parseBinaryExpression(left, operator) {
+    index++;
+    const right = parsePrimaryExpression();
+    if (!right) throw new Error(`Expected expression after '${operator}'`);
+    return { type: "BinaryExpression", operator, left, right };
+  }
+
+  function parseVariableDeclaration() {
+    const name = tokens[index++];
+    if (tokens[index++] !== "=") {
+      console.error("Tokens before error:", tokens.slice(index - 5, index + 5));
+      throw new Error("Expected '=' after variable name");
+    }
+    const value = parseExpression();
+    return { type: "VariableDeclaration", name, value };
+  }
+
+  function parseFunctionDeclaration() {
+    const name = tokens[index++];
+    if (tokens[index++] !== "(") throw new Error("Expected '('");
+    const params = [];
+    while (tokens[index] !== ")") {
+      params.push(tokens[index++]);
+      if (tokens[index] === ",") index++;
+    }
+    index++; // Skip ')'
+    if (tokens[index++] !== "{") throw new Error("Expected '{'");
+    const body = [];
+    while (tokens[index] !== "}" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) body.push(stmt);
+    }
+    if (tokens[index] === "}") index++; // ✅ Ensure '}' is skipped
+    return { type: "FunctionDeclaration", name, params, body };
+  }
+
+  function isBinaryOperator(token) {
+    return ["+", "-", "*", "/", "==", "!=", ">=", "<="].includes(token);
   }
 
   const ast = { type: "Program", body: [] };

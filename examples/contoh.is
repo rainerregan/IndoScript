@@ -2,5 +2,5 @@ fungsi tambah(a, b) {
     kembali a + b;
 }
 
-atur hasil = tambah(5, 10);
+atur hasil = tambah(5, tambah(1, 2));
 tampilkan(hasil);
