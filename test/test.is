@@ -44,3 +44,13 @@ e = 2;
 f = 3;
 
 tampilkan(abc(e, f));
+
+// Testing Loop
+tampilkan("Testing 4: Test Loop");
+
+atur i = 0;
+
+selama (i < 5) {
+  tampilkan(i);
+  i = i + 1;
+}
