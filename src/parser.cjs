@@ -1,6 +1,6 @@
 let recursionDepth = 0;
 const MAX_DEPTH = 1000; // Prevent infinite recursion
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 function parse(tokens) {
   let index = 0;
@@ -112,9 +112,15 @@ function parse(tokens) {
   function parseMethodCall(object, method) {
     if (tokens[index++] !== "(") throw new Error("Expected '(' after method name");
     const args = [];
-    while (tokens[index] !== ")" && index < tokens.length) {
-      args.push(parseExpression());
-      if (tokens[index] === ",") index++;
+    if (method === "forEach") {
+      console.log("Parsing forEach method call");
+      index++; // Skip 'fungsi'
+      args.push(parseFunctionDeclaration());
+    } else {
+      while (tokens[index] !== ")" && index < tokens.length) {
+        args.push(parseExpression());
+        if (tokens[index] === ",") index++;
+      }
     }
     if (tokens[index++] !== ")") throw new Error("Expected closing ')'");
     return { type: "MethodCall", object, method, arguments: args };
@@ -191,6 +197,9 @@ function parse(tokens) {
     }
     if (tokens[index] !== ")") throw new Error("Expected closing ')'");
     index++;
+    // if (tokens[index] === "=>") {
+    //   return parseArrowFunction(callee);
+    // }
     return { type: "FunctionCall", callee, arguments: args };
   }
 
@@ -221,20 +230,40 @@ function parse(tokens) {
   function parseFunctionDeclaration() {
     const name = tokens[index++];
     if (tokens[index++] !== "(") throw new Error("Expected '('");
+
     const params = [];
     while (tokens[index] !== ")") {
       params.push(tokens[index++]);
       if (tokens[index] === ",") index++;
     }
     index++; // Skip ')'
+
     if (tokens[index++] !== "{") throw new Error("Expected '{'");
     const body = [];
     while (tokens[index] !== "}" && index < tokens.length) {
       const stmt = parseStatement();
       if (stmt) body.push(stmt);
     }
+
     if (tokens[index] === "}") index++; // ✅ Ensure '}' is skipped
-    return { type: "FunctionDeclaration", name, params, body };
+    const parsed = { type: "FunctionDeclaration", name, params, body };
+    console.log("Parsed function declaration:", parsed);
+    return parsed;
+  }
+
+  function parseArrowFunction(params) {
+    if (tokens[index++] !== "=>") throw new Error("Expected '=>' in arrow function");
+
+    console.log("Arrow function params:", params);
+
+    if (tokens[index++] !== "{") throw new Error("Expected '{' in arrow function");
+    const body = [];
+    while (tokens[index] !== "}" && index < tokens.length) {
+      const stmt = parseStatement();
+      if (stmt) body.push(stmt);
+    }
+    if (tokens[index] === "}") index++;
+    return { type: "ArrowFunction", params, body };
   }
 
   function parseIfStatement() {
@@ -304,7 +333,7 @@ function parse(tokens) {
     const update = parseForLoopUpdate();
     if (tokens[index++] !== ")") throw new Error("Expected ')' after update expression");
     if (tokens[index++] !== "{") throw new Error("Expected '{' after condition");
-    
+
     // read the body of the for loop
     const body = [];
     while (tokens[index] !== "}" && index < tokens.length) {

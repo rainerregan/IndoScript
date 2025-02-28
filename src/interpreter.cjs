@@ -39,6 +39,8 @@ function interpret(ast, env = {}) {
         return evaluateFunctionCall(node, currentEnv);
       case "FunctionDeclaration":
         return evaluateFunctionDeclaration(node, currentEnv);
+      case "ArrowFunction":
+        return evaluateArrowFunction(node, currentEnv);
       case "ExpressionStatement":
         return evaluate(node.expression, currentEnv);
       case "ReturnStatement":
@@ -88,6 +90,8 @@ function interpret(ast, env = {}) {
   function evaluateMethodCall(node, currentEnv) {
     const object = evaluate(node.object, currentEnv);
     const args = node.arguments.map(arg => evaluate(arg, currentEnv));
+    console.log("MethodCall", node, object, args);
+
     if (node.method === "push") {
       if (!Array.isArray(object)) {
         throw new Error(`'${node.object.name}' is not an array`);
@@ -172,7 +176,7 @@ function interpret(ast, env = {}) {
 
   function evaluateFunctionCall(node, currentEnv) {
     const func = evaluate(node.callee, currentEnv);
-    if (!func || func.type !== "Function") {
+    if (!func || (func.type !== "Function" && func.type !== "ArrowFunction")) {
       throw new Error(`'${node.callee.name}' is not a function`);
     }
 
@@ -204,6 +208,15 @@ function interpret(ast, env = {}) {
       body: node.body,
     };
     return null;
+  }
+
+  function evaluateArrowFunction(node, currentEnv) {
+    if (DEBUG_MODE) console.log(`Declaring arrow function '${node.name}'`, node.params, node.body);
+    return {
+      type: "ArrowFunction",
+      params: node.params,
+      body: node.body,
+    };
   }
 
   function evaluateIfStatement(node, currentEnv) {

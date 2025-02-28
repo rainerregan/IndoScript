@@ -113,6 +113,12 @@ function tokenize(code) {
       continue;
     }
 
+    if (code.slice(i, i + 2) === "=>") {
+      tokens.push("=>");
+      i += 2;
+      continue;
+    }
+
     if (char === "[") {
       tokens.push("[");
       i++;

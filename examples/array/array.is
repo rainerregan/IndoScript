@@ -6,4 +6,13 @@ array.dorong(8)
 
 atur newArray = [0, 1, 2, 4, 8, ...array]
 
-cetak(array)
+atur fun = (nilai) => {
+  cetak(nilai)
+}
+
+fungsi abc(nilai) {
+  cetak(nilai)
+}
+abc(12)
+
+fun(23)

@@ -1,0 +1,5 @@
+atur array = [1, 1, 2, 4]
+
+array.untukSetiap(fungsi callback(nilai, indeks) {
+  cetak(nilai)
+})
